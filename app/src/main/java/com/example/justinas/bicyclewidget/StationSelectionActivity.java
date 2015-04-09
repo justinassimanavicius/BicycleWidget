@@ -55,7 +55,9 @@ public class StationSelectionActivity extends ActionBarActivity implements OnChe
 
                 Intent resultValue = new Intent();
                 resultValue.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+                int[] ids = new int[1];
+                ids[0] = widgetId;
+                resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
                 setResult(RESULT_OK, resultValue);
                 finish();
             }

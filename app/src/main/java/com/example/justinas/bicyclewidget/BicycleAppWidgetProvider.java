@@ -73,7 +73,7 @@ public class BicycleAppWidgetProvider extends AppWidgetProvider {
 
             appWidgetManager.updateAppWidget(appWidgetId, views);
 
-            setListAdapter(appWidgetId, context, appWidgetManager);
+            //setListAdapter(appWidgetId, context, appWidgetManager);
         }
     }
 

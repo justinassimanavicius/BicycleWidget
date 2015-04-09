@@ -14,7 +14,9 @@ public class StationService {
         WebService webService = new WebService();
         String response = "";
         try {
-            response = webService.getString("https://api.jcdecaux.com/vls/v1/stations?contract=Vilnius&apiKey=0421eb3ae0784bab99af659dbfe826f7cd48a7df");
+            String urlString = "https://api.jcdecaux.com/vls/v1/stations?contract=Vilnius&apiKey=0421eb3ae0784bab99af659dbfe826f7cd48a7df";
+            //urlString ="http://m.uploadedit.com/ba3b/1428472074263.txt";
+            response = webService.getString(urlString);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
