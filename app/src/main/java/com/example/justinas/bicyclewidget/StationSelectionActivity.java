@@ -1,6 +1,7 @@
 package com.example.justinas.bicyclewidget;
 
 import android.appwidget.AppWidgetManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RemoteViews;
 
 import com.example.justinas.bicyclewidget.entities.SelectableStation;
 import com.example.justinas.bicyclewidget.entities.Station;
@@ -39,33 +39,39 @@ public class StationSelectionActivity extends ActionBarActivity implements OnChe
 
         widgetId = getWidgetId();
 
-         settingsStore = new SettingsStore(getBaseContext());
+         settingsStore = new SettingsStore(this);
 
         listView = (ListView) findViewById(R.id.listView);
 
         Button saveButton = (Button) findViewById(R.id.saveButton);
 
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getBaseContext());
-                RemoteViews views = new RemoteViews(getBaseContext().getPackageName(),
-                        R.layout.example_appwidget);
-                appWidgetManager.updateAppWidget(widgetId, views);
-
-                Intent resultValue = new Intent();
-                resultValue.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                int[] ids = new int[1];
-                ids[0] = widgetId;
-                resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                setResult(RESULT_OK, resultValue);
-                finish();
-            }
-        });
+        saveButton.setOnClickListener(mOnClickListener);
         new DownloadStationsTask().execute();
 
 
     }
+
+    View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        public void onClick(View v) {
+            final Context context = StationSelectionActivity.this;
+
+            // When the button is clicked, save the string in our prefs and return that they
+            // clicked OK.
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+            BicycleAppWidgetProvider.updateAppWidget(context, appWidgetManager,
+                    widgetId);
+
+            // Make sure we pass back the original appWidgetId
+            Intent resultValue = new Intent();
+            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
+            setResult(RESULT_OK, resultValue);
+            finish();
+        }
+    };
+
+
+
+
 
     private int getWidgetId() {
         Intent intent = getIntent();

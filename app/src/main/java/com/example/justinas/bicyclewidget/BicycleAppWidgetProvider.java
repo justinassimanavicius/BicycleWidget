@@ -37,6 +37,14 @@ public class BicycleAppWidgetProvider extends AppWidgetProvider {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
+    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+                                int appWidgetId) {
+        int[] ids = new int[1];
+        ids[0]= appWidgetId;
+        setClickHandlers(context, appWidgetManager, ids);
+    }
+
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -45,6 +53,7 @@ public class BicycleAppWidgetProvider extends AppWidgetProvider {
         if (action == WIDGET_UPDATE_ACTION) {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             int[] widgetIds = intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS);
+            Log.i("onReceive", "test"+intent.getIntExtra("test",0) + " widgetIds 0"+widgetIds.toString());
             new DownloadStationsTask(context, appWidgetManager, widgetIds).execute();
         }
 
@@ -52,13 +61,13 @@ public class BicycleAppWidgetProvider extends AppWidgetProvider {
     }
 
 
-    private void setClickHandlers(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+    private static void setClickHandlers(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         final int N = appWidgetIds.length;
 
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int i = 0; i < N; i++) {
             int appWidgetId = appWidgetIds[i];
-
+Log.d("setClickHandlers", "click handler for "+appWidgetId+" i="+i+" / "+N);
             setRefreshHandler(context, appWidgetId,appWidgetManager);
             setConfigHandler(context, appWidgetId,appWidgetManager);
 
@@ -67,7 +76,7 @@ public class BicycleAppWidgetProvider extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.example_appwidget);
             Date d = new Date();
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm:ss") ;
-            views.setTextViewText(R.id.refreshTextView, simpleDateFormat.format(d));
+            views.setTextViewText(R.id.refreshTextView, appWidgetId+" "+simpleDateFormat.format(d));
 
 
 
@@ -100,22 +109,26 @@ public class BicycleAppWidgetProvider extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, rv);
     }
 
-    private void setRefreshHandler(Context context, int appWidgetId, AppWidgetManager appWidgetManager) {
+    private static void setRefreshHandler(Context context, int appWidgetId, AppWidgetManager appWidgetManager) {
         Intent clickIntent = new Intent(context, BicycleAppWidgetProvider.class);
 
         clickIntent.setAction(WIDGET_UPDATE_ACTION);
         int[] ids = new int[1];
         ids[0] = appWidgetId;
         clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        clickIntent.putExtra("test", appWidgetId);
+        clickIntent.setData(Uri.parse(clickIntent.toUri(Intent.URI_INTENT_SCHEME)));
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.example_appwidget);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.refreshButton, pendingIntent);
+        Log.d("setRefreshHandler", "click handler for appWidgetId "+appWidgetId);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
-    private void setConfigHandler(Context context, int appWidgetId, AppWidgetManager appWidgetManager) {
+    private static void setConfigHandler(Context context, int appWidgetId, AppWidgetManager appWidgetManager) {
         Intent configIntent = new Intent(context, StationSelectionActivity.class);
         configIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        configIntent.setData(Uri.parse(configIntent.toUri(Intent.URI_INTENT_SCHEME)));
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, configIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.example_appwidget);
         remoteViews.setOnClickPendingIntent(R.id.configureButton, pendingIntent);
@@ -186,7 +199,7 @@ public class BicycleAppWidgetProvider extends AppWidgetProvider {
                     views.setTextViewText(R.id.stationsTextView, res);
                     Date d = new Date();
 
-                    views.setTextViewText(R.id.refreshTextView, simpleDateFormat.format(d));
+                    views.setTextViewText(R.id.refreshTextView, appWidgetId+" w"+simpleDateFormat.format(d));
                 }
                 // Tell the AppWidgetManager to perform an update on the current app widget
                 appWidgetManager.updateAppWidget(appWidgetId, views);

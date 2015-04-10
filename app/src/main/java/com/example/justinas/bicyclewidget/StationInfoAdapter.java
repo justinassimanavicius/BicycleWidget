@@ -1,7 +1,6 @@
 package com.example.justinas.bicyclewidget;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +37,6 @@ public class StationInfoAdapter extends ArrayAdapter<Station> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder holder = null;
-        Log.v("ConvertView", String.valueOf(position));
 
         if (convertView == null) {
             LayoutInflater vi = (LayoutInflater)context.getSystemService(
